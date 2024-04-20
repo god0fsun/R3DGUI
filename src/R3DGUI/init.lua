@@ -53,6 +53,7 @@ function _3DGUi.new(gui:SurfaceGui, Settings : GUISettings)
    self.gui = gui:Clone()
    self.gui.Parent = Player.PlayerGui
    self.gui.Adornee = self.__part
+   self.gui.AlwaysOnTop = true
 
    self.__currentOffset = Settings.Offset
    self.__currentSize = Settings.Size
@@ -60,6 +61,15 @@ function _3DGUi.new(gui:SurfaceGui, Settings : GUISettings)
    self.__springPos = Spring.new(V3Z)
    self.__springRot = Spring.new(V3Z)
    self.__springSize = Spring.new(V3Z)
+
+   self.__springPos._damper = .35
+   self.__springPos._speed = 16
+
+   self.__springRot._damper = .35
+   self.__springRot._speed = 16
+
+   self.__springSize._damper = .35
+   self.__springSize._speed = 16
 
    self.__update = RunService.PreRender:Connect(function(deltaTimeRender)
         local screenRatio = CF(ConvertScreenToWorld(Camera.ViewportSize))
