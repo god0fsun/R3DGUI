@@ -54,6 +54,7 @@ function _3DGUi.new(gui:SurfaceGui, Settings : GUISettings)
    self.gui.Parent = Player.PlayerGui
    self.gui.Adornee = self.__part
    self.gui.AlwaysOnTop = true
+   self.gui.ResetOnSpawn = false
 
    self.__currentOffset = Settings.Offset
    self.__currentSize = Settings.Size
