@@ -6,9 +6,12 @@ local Camera = workspace.CurrentCamera :: Camera
 local rad = math.rad
 local CF = CFrame.new
 local ANG = CFrame.Angles
+local V3 = Vector3.new
+local V3Z = Vector3.zero
 
 export type GUISettings = {
     Offset : CFrame,
+    Size : Vector3,
     LerpDelta : number
 }
 
@@ -21,6 +24,7 @@ function _3DGUi.new(gui:BillboardGui, Settings : GUISettings)
    local self = setmetatable({}, _3DGUi)
    self.offset = Settings.Offset
    self.__lerpdelta = Settings.lerpdelta
+   self.size = Settings.Size
 
    self.__part = Instance.new("Part")
    self.__part.Transparency = 1
@@ -36,9 +40,11 @@ function _3DGUi.new(gui:BillboardGui, Settings : GUISettings)
    self.gui.Adornee = self.__part
 
    self.__currentOffset = Settings.Offset
+   self.__currentSize = Settings.Size
 
-   self.__springPos = Spring.new(Vector3.zero)
-   self.__springRot = Spring.new(Vector3.zero)
+   self.__springPos = Spring.new(V3Z)
+   self.__springRot = Spring.new(V3Z)
+   self.__springSize = Spring.new(V3Z)
 
    self.__update = RunService.RenderStepped:Connect(function(deltaTime)
         local ratios = {
@@ -48,13 +54,15 @@ function _3DGUi.new(gui:BillboardGui, Settings : GUISettings)
 
         local posSpring = self.__springPos.Position :: Vector3
         local rotSpring = self.__springRot.Position :: Vector3
+        local sizeSpring = self.__springSize.Position :: Vector3
         local offsetPosition = self.offset.Position
+        local offsetSize = self.size
         local offsetRotation = Vector3.new(self.offset:ToEulerAnglesXYZ())
 
         local offset = Vector3.new(
             offsetPosition.X * ratios.X,
             offsetPosition.Y * ratios.Y,
-            offsetPosition.Z * posSpring.Z
+            offsetPosition.Z
         )
 
         local rotation = ANG(
@@ -63,11 +71,19 @@ function _3DGUi.new(gui:BillboardGui, Settings : GUISettings)
             rad(offsetRotation.Z)
         )
 
+        local size = V3(
+            offsetSize.X * sizeSpring.X,
+            offsetSize.Y * sizeSpring.Y,
+            offsetSize.Z * sizeSpring.Z
+        )
+
+
         local springCF = CF(posSpring) * ANG(rotSpring)
         local newOffset = CF(offset) * rotation
         self.__currentOffset = self.__currentOffset:Lerp(newOffset, self.__lerpdelta) * springCF
 
         self.__part.CFrame = self.__currentOffset
+        self.__part.Size = self.__currentSize
    end)
 
    return self
