@@ -5,7 +5,7 @@ Springs are used by Quenty's nevermore: [src/spring/src/Shared/Spring.lua](https
 
 # Pros:
 * Add depth to your games
-* Removes the flatness that screenGuis give.
+* Removes the flatness that screenGuis give
 * Make them more interactable with what you do **(IE: shaking from camera movement)**
 
 # Cons:
