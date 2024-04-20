@@ -127,8 +127,8 @@ function _3DGUi:GetSpringSize()
     return self.__springSize
 end
 
-function _3DGUi:SetOffset(v3)
-    self.offset = v3
+function _3DGUi:SetOffset(cf)
+    self.offset = cf
 end
 
 function _3DGUi.Impulse(self, Position, Rotation)
