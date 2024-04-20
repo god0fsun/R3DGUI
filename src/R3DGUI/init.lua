@@ -20,10 +20,10 @@ _3DGUi.__index = _3DGUi
 
 local Spring = require(script.Spring)
 
-function _3DGUi.new(gui:BillboardGui, Settings : GUISettings)
+function _3DGUi.new(gui:SurfaceGui, Settings : GUISettings)
    local self = setmetatable({}, _3DGUi)
    self.offset = Settings.Offset
-   self.__lerpdelta = Settings.lerpdelta
+   self.__lerpdelta = Settings.LerpDelta
    self.size = Settings.Size
 
    self.__part = Instance.new("Part")
@@ -46,7 +46,7 @@ function _3DGUi.new(gui:BillboardGui, Settings : GUISettings)
    self.__springRot = Spring.new(V3Z)
    self.__springSize = Spring.new(V3Z)
 
-   self.__update = RunService.RenderStepped:Connect(function(deltaTime)
+   self.__update = RunService.PreRender:Connect(function(deltaTimeRender)
         local ratios = {
             X = Camera.ViewportSize.X/Camera.ViewportSize.Y,
             Y = Camera.ViewportSize.Y/Camera.ViewportSize.X
@@ -57,12 +57,14 @@ function _3DGUi.new(gui:BillboardGui, Settings : GUISettings)
         local sizeSpring = self.__springSize.Position :: Vector3
         local offsetPosition = self.offset.Position
         local offsetSize = self.size
-        local offsetRotation = Vector3.new(self.offset:ToEulerAnglesXYZ())
+
+        local rx, ry, rz =  self.offset:ToOrientation()
+        local offsetRotation = Vector3.new(math.deg(rx), math.deg(ry),math.deg(rz))
 
         local offset = Vector3.new(
             offsetPosition.X * ratios.X,
             offsetPosition.Y * ratios.Y,
-            offsetPosition.Z
+            -offsetPosition.Z
         )
 
         local rotation = ANG(
@@ -78,8 +80,8 @@ function _3DGUi.new(gui:BillboardGui, Settings : GUISettings)
         )
 
 
-        local springCF = CF(posSpring) * ANG(rotSpring)
-        local newOffset = CF(offset) * rotation
+        local springCF = CF(posSpring) * ANG(rad(rotSpring.X), rad(rotSpring.Y), rad(rotSpring.Z))
+        local newOffset = Camera.CFrame * CF(offset) * rotation
         self.__currentOffset = self.__currentOffset:Lerp(newOffset, self.__lerpdelta) * springCF
 
         self.__part.CFrame = self.__currentOffset
