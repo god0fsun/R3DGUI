@@ -115,6 +115,22 @@ function _3DGUi.new(gui:SurfaceGui, Settings : GUISettings)
    return self
 end
 
+function _3DGUi:GetSpringPos()
+    return self.__springPos
+end
+
+function _3DGUi:GetSpringRot()
+    return self.__springRot
+end
+
+function _3DGUi:GetSpringSize()
+    return self.__springSize
+end
+
+function _3DGUi:SetOffset(v3)
+    self.offset = v3
+end
+
 function _3DGUi.Impulse(self, Position, Rotation)
     if self.__update then
         self.__springPos:Impulse(Position)
