@@ -9,6 +9,8 @@ local ANG = CFrame.Angles
 local V3 = Vector3.new
 local V3Z = Vector3.zero
 
+local preference = 15 -- Multiply offset provided in settings by this for easier offset apply
+
 export type GUISettings = {
     Offset : CFrame,
     Size : Vector3,
@@ -19,6 +21,19 @@ local _3DGUi = {}
 _3DGUi.__index = _3DGUi
 
 local Spring = require(script.Spring)
+
+local function ConvertScreenToWorld(ScreenPosition : Vector2) : Vector3
+    local ray = Camera:ScreenPointToRay(ScreenPosition.X, ScreenPosition.Y, 0)
+    local world = ray.Origin
+    return world
+end
+
+local function FindActualOffset(x, y, z)
+    x /= preference
+    y /= preference
+    z = z
+   return Vector3.new(x, y, z) 
+end
 
 function _3DGUi.new(gui:SurfaceGui, Settings : GUISettings)
    local self = setmetatable({}, _3DGUi)
@@ -47,10 +62,8 @@ function _3DGUi.new(gui:SurfaceGui, Settings : GUISettings)
    self.__springSize = Spring.new(V3Z)
 
    self.__update = RunService.PreRender:Connect(function(deltaTimeRender)
-        local ratios = {
-            X = Camera.ViewportSize.X/Camera.ViewportSize.Y,
-            Y = Camera.ViewportSize.Y/Camera.ViewportSize.X
-        }
+        local screenRatio = CF(ConvertScreenToWorld(Camera.ViewportSize))
+        local relativeToCamera = Camera.CFrame:ToObjectSpace(screenRatio)
 
         local posSpring = self.__springPos.Position :: Vector3
         local rotSpring = self.__springRot.Position :: Vector3
@@ -62,8 +75,8 @@ function _3DGUi.new(gui:SurfaceGui, Settings : GUISettings)
         local offsetRotation = Vector3.new(math.deg(rx), math.deg(ry),math.deg(rz))
 
         local offset = Vector3.new(
-            offsetPosition.X * ratios.X,
-            offsetPosition.Y * ratios.Y,
+            (offsetPosition.X * preference) * relativeToCamera.X,
+            (offsetPosition.Y * preference) * relativeToCamera.Y,
             -offsetPosition.Z
         )
 
